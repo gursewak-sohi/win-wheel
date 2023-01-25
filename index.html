@@ -1,0 +1,153 @@
+<html>
+
+<head>
+    <title>HTML5 Canvas Winning Wheel</title>
+    <link rel="stylesheet" href="main.css" type="text/css" />
+    <script type="text/javascript" src="../Winwheel.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
+    <script src="./confetti.js"></script>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <div class="wheel-wrapper">
+            <img class="pointer" src="pointer.svg" alt="">
+            <canvas class="wheel" id="canvas" width="434" height="434">
+                            <p align="center">Sorry, your browser doesn't support canvas. Please try another.</p>
+                        </canvas>
+            <div class="wheel-shadow"></div>
+            <div class="wheel-btn-wapper">
+                <button onClick="startSpin()" id="startWheel" type="button" class="wheel-btn"><!---->
+                    <svg data-v-0500bdde="" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg" name="play" class="path-fill-current inline-block" viewBox="0 0 24 24"><path d="M19.669 10.385L6.199 2.257c-1.094-.66-2.77-.02-2.77 1.613v16.253c0 1.465 1.557 2.348 2.77 1.613l13.47-8.124c1.201-.723 1.205-2.504 0-3.227z" fill="#fff"></path></svg><!---->
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create new wheel object specifying the parameters at creation time.
+        let theWheel = new Winwheel({
+            'numSegments': 8, // Specify number of segments.
+            'outerRadius': 212, // Set outer radius so wheel fits inside the background.
+            'textFontSize': 24, // Set font size as desired.
+            'fillStyle': '#fff',
+            'segments': // Define segments including colour and text.
+                [{
+                'fillStyle': '#8D01E4',
+                'text': 'Prize 1'
+            }, {
+                'fillStyle': '#CA016F',
+                'text': 'Prize 2'
+            }, {
+                'fillStyle': '#FB3501',
+                'text': 'Prize 3'
+            }, {
+                'fillStyle': '#FC9E02',
+                'text': 'Prize 4'
+            }, {
+                'fillStyle': '#FEE503',
+                'text': 'Prize 5'
+            }, {
+                'fillStyle': '#62C52F',
+                'text': 'Prize 6'
+            }, {
+                'fillStyle': '#0760ED',
+                'text': 'Prize 7'
+            }, {
+                'fillStyle': '#2C13F8',
+                'text': 'Prize 8'
+            }],
+            'animation': // Specify the animation to use.
+            {
+                'type': 'spinToStop',
+                'duration': 15,
+                'spins': 8,
+                'callbackFinished': alertPrize,
+                'callbackSound': playSound, // Function to call when the tick sound is to be triggered.
+                'soundTrigger': 'pin' // Specify pins are to trigger the sound, the other option is 'segment'.
+            },
+            'pins': {
+                'number': 8 // Number of pins. They space evenly around the wheel.
+            }
+        });
+
+        // -----------------------------------------------------------------
+        // This function is called when the segment under the prize pointer changes
+        // we can play a small tick sound here like you would expect on real prizewheels.
+        // -----------------------------------------------------------------
+        let audio = new Audio('tick.mp3'); // Create audio object and load tick.mp3 file.
+        let winAudio = new Audio('tadaa.mp3');
+
+        function playSound() {
+            // Stop and rewind the sound if it already happens to be playing.
+            audio.pause();
+            audio.currentTime = 0;
+
+            // Play the sound.
+            audio.play();
+
+        }
+
+        // -------------------------------------------------------
+        // Called when the spin animation has finished by the callback feature of the wheel because I specified callback in the parameters
+        // note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
+        // -------------------------------------------------------
+        function alertPrize(indicatedSegment) {
+            // console.log(indicatedSegment)
+            // Do basic alert of the segment text.
+            // You would probably want to do something more interesting with this information.
+            alert("You have won " + indicatedSegment.text);
+            document.getElementById('startWheel').removeAttribute("disabled", "true");
+            winAudio.play();
+            startConfetti()
+            setTimeout(() => {
+                stopConfetti()
+            }, 3000);
+        }
+
+        // =======================================================================================================================
+        // Code below for the power controls etc which is entirely optional. You can spin the wheel simply by
+        // calling theWheel.startAnimation();
+        // =======================================================================================================================
+        let wheelPower = 0;
+        let wheelSpinning = true;
+
+
+        // -------------------------------------------------------
+        // Click handler for spin button.
+        // -------------------------------------------------------
+        function startSpin() {
+
+            resetWheel()
+                // Ensure that spinning can't be clicked again while already running.
+            if (wheelSpinning == true) {
+
+                theWheel.animation.spins = 12;
+
+                // Disable the spin button so can't click again while wheel is spinning.
+                document.getElementById('startWheel').setAttribute("disabled", "true");
+                // document.getElementById('spin_button').className = "";
+
+                // Begin the spin animation by calling startAnimation on the wheel object.
+                theWheel.startAnimation();
+
+                // the current animation. The user will have to reset before spinning again.
+                wheelSpinning = true;
+            }
+        }
+
+        // -------------------------------------------------------
+        // Function for reset button.
+        // -------------------------------------------------------
+        function resetWheel() {
+            theWheel.stopAnimation(false); // Stop the animation, false as param so does not call callback function.
+            theWheel.rotationAngle = 0; // Re-set the wheel angle to 0 degrees.
+            theWheel.draw(); // Call draw to render changes to the wheel.
+
+            wheelSpinning = true; // Reset to false to power buttons and spin can be clicked again.
+        }
+    </script>
+</body>
+
+</html>
