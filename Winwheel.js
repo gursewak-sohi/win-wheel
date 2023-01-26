@@ -1648,6 +1648,7 @@ Winwheel.prototype.getCurrentPinNumber = function() {
         // will not always be at the 12 o'clock 0 degrees location.
         let relativeAngle = Math.floor(this.pointerAngle - rawAngle);
 
+
         if (relativeAngle < 0) {
             relativeAngle = 360 - Math.abs(relativeAngle);
         }

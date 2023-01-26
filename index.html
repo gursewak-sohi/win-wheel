@@ -3,6 +3,7 @@
 <head>
     <title>HTML5 Canvas Winning Wheel</title>
     <link rel="stylesheet" href="main.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="./Winwheel.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/gsap/latest/TweenMax.min.js"></script>
     <script src="./confetti.js"></script>
@@ -18,15 +19,17 @@
                         </canvas>
             <div class="wheel-shadow"></div>
             <div class="wheel-btn-wapper">
-                <button onClick="startSpin()" id="startWheel" type="button" class="wheel-btn"><!---->
+                <button onClick="startFixedSpin()" id="startWheel" type="button" class="wheel-btn"><!---->
                     <svg data-v-0500bdde="" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg" name="play" class="path-fill-current inline-block" viewBox="0 0 24 24"><path d="M19.669 10.385L6.199 2.257c-1.094-.66-2.77-.02-2.77 1.613v16.253c0 1.465 1.557 2.348 2.77 1.613l13.47-8.124c1.201-.723 1.205-2.504 0-3.227z" fill="#fff"></path></svg><!---->
                 </button>
             </div>
         </div>
+        <div id="wheelPrice" class="wheel-price">Your Price</div>
     </div>
 
     <script>
         // Create new wheel object specifying the parameters at creation time.
+        let price = document.querySelector('#wheelPrice')
         let theWheel = new Winwheel({
             'numSegments': 8, // Specify number of segments.
             'outerRadius': 212, // Set outer radius so wheel fits inside the background.
@@ -94,10 +97,12 @@
         // note the indicated segment is passed in as a parmeter as 99% of the time you will want to know this to inform the user of their prize.
         // -------------------------------------------------------
         function alertPrize(indicatedSegment) {
-            // console.log(indicatedSegment)
-            // Do basic alert of the segment text.
-            // You would probably want to do something more interesting with this information.
-            alert("You have won " + indicatedSegment.text);
+            console.log(indicatedSegment)
+            price.innerHTML = indicatedSegment.text
+            price.style.backgroundColor = indicatedSegment.fillStyle
+                // Do basic alert of the segment text.
+                // You would probably want to do something more interesting with this information.
+                // alert("You have won " + indicatedSegment.text);
             document.getElementById('startWheel').removeAttribute("disabled", "true");
             winAudio.play();
             startConfetti()
@@ -114,16 +119,13 @@
         let wheelSpinning = true;
 
 
-        // -------------------------------------------------------
-        // Click handler for spin button.
-        // -------------------------------------------------------
-        function startSpin() {
-
+        //  Start Random Spin
+        function startRandomSpin() {
             resetWheel()
                 // Ensure that spinning can't be clicked again while already running.
             if (wheelSpinning == true) {
 
-                theWheel.animation.spins = 12;
+                theWheel.animation.spins = 1;
 
                 // Disable the spin button so can't click again while wheel is spinning.
                 document.getElementById('startWheel').setAttribute("disabled", "true");
@@ -137,10 +139,29 @@
             }
         }
 
+        // Start fixed Spin
+        function startFixedSpin() {
+            resetWheel()
+
+            // Disable the spin button so can't click again while wheel is spinning.
+            document.getElementById('startWheel').setAttribute("disabled", "true");
+            // This formula always makes the wheel stop somewhere inside prize 3 at least
+            // 1 degree away from the start and end edges of the segment.
+            let stopAt = (91 + Math.floor((Math.random() * 43)))
+
+            // Important thing is to set the stopAngle of the animation before stating the spin.
+            theWheel.animation.stopAngle = stopAt;
+
+            // May as well start the spin from here.
+            theWheel.startAnimation();
+        }
+
         // -------------------------------------------------------
         // Function for reset button.
         // -------------------------------------------------------
         function resetWheel() {
+            price.innerHTML = 'Your Price'
+            price.style.backgroundColor = '#CCCCCC'
             theWheel.stopAnimation(false); // Stop the animation, false as param so does not call callback function.
             theWheel.rotationAngle = 0; // Re-set the wheel angle to 0 degrees.
             theWheel.draw(); // Call draw to render changes to the wheel.

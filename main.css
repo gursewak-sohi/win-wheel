@@ -14,6 +14,7 @@ body {
     align-items: center;
     justify-content: center;
     min-height: 100vh;
+    flex-direction: column;
 }
 
 .wheel-wrapper {
@@ -43,8 +44,8 @@ body {
 
 .pointer {
     position: absolute;
-    top: 38px;
-    left: 24px;
+    top: 36px;
+    left: 26px;
     /* transform: rotate(12deg); */
     z-index: 20;
 }
@@ -93,6 +94,16 @@ body {
     margin: 0px 0 0 4px;
 }
 
+.wheel-price {
+    font-size: 20px;
+    text-align: center;
+    padding: 10px 24px;
+    border-radius: 8px;
+    background-color: #ccc;
+    margin-top: 50px;
+    color: #fff;
+}
+
 #confetti-canvas {
     position: absolute;
     width: 100vw;
@@ -104,5 +115,8 @@ body {
 @media screen and (max-width: 480px) {
     .wheel-wrapper {
         transform: scale(0.6);
+    }
+    .wheel-price {
+        font-size: 16px;
     }
 }
